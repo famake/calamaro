@@ -17,6 +17,7 @@ document.getElementById('device-form').addEventListener('submit', async (e) => {
         await api('/devices', 'POST', {
             name: document.getElementById('device-name').value,
             ip: document.getElementById('device-ip').value,
+            port: parseInt(document.getElementById('device-port').value),
             pixels: parseInt(document.getElementById('device-pixels').value)
         });
         alert('Device added');
