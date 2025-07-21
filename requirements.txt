@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]
+pyartnet==1.0.1
+paho-mqtt
