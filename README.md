@@ -14,3 +14,8 @@ Run the server:
 python controller.py
 ```
 Send REST commands to http://localhost:8000.
+
+## Web UI
+A small static web interface is available after starting the server.
+Open `http://localhost:8000/ui/` in your browser to add devices,
+create groups and set colors via forms.

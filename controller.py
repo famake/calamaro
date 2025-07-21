@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 from pydantic import BaseModel
 import paho.mqtt.client as mqtt
@@ -60,6 +61,7 @@ class Controller:
 
 controller = Controller()
 app = FastAPI()
+app.mount("/ui", StaticFiles(directory="static", html=True), name="static")
 
 
 class DeviceModel(BaseModel):
