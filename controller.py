@@ -31,6 +31,7 @@ class Controller:
         self.devices: Dict[str, Device] = {}
         self.groups: Dict[str, Group] = {}
         self.universes: Dict[str, pyartnet.ArtNetNode] = {}
+        self.channels: Dict[str, pyartnet.base.Channel] = {}
 
     def add_device(self, name: str, ip: str, pixels: int, port: int = 6454) -> None:
         if name in self.devices:
@@ -39,7 +40,9 @@ class Controller:
         self.devices[name] = device
         node = pyartnet.ArtNetNode(ip, port)
         universe = node.add_universe(0)
+        channel = universe.add_channel(1, pixels * 3, 'uint8')
         self.universes[name] = universe
+        self.channels[name] = channel
 
     def add_group(self, name: str, device_names: List[str]) -> None:
         if name in self.groups:
@@ -55,11 +58,14 @@ class Controller:
         if group not in self.groups:
             raise ValueError(f"Group {group} not defined")
         for device in self.groups[group].devices:
-            universe = self.universes[device.name]
-            # DMX channel indexing starts at 1. Using 0 causes a
-            # ChannelOutOfUniverseError in pyartnet.
-            ch = universe.add_channel(1, device.pixels * 3, 'uint8')
-            await ch.add_fade([r, g, b] * device.pixels, 0)
+            channel = self.channels.get(device.name)
+            if channel is None:
+                universe = self.universes[device.name]
+                # DMX channel indexing starts at 1. Using 0 causes a
+                # ChannelOutOfUniverseError in pyartnet.
+                channel = universe.add_channel(1, device.pixels * 3, 'uint8')
+                self.channels[device.name] = channel
+            await channel.add_fade([r, g, b] * device.pixels, 0)
 
 
 controller = Controller()
