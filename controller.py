@@ -17,6 +17,7 @@ class Device:
     name: str
     ip: str
     pixels: int
+    port: int = 6454
 
 
 @dataclass
@@ -31,12 +32,12 @@ class Controller:
         self.groups: Dict[str, Group] = {}
         self.universes: Dict[str, pyartnet.ArtNetNode] = {}
 
-    def add_device(self, name: str, ip: str, pixels: int) -> None:
+    def add_device(self, name: str, ip: str, pixels: int, port: int = 6454) -> None:
         if name in self.devices:
             raise ValueError(f"Device {name} exists")
-        device = Device(name=name, ip=ip, pixels=pixels)
+        device = Device(name=name, ip=ip, pixels=pixels, port=port)
         self.devices[name] = device
-        node = pyartnet.ArtNetNode(ip)
+        node = pyartnet.ArtNetNode(ip, port)
         universe = node.add_universe(0)
         self.universes[name] = universe
 
@@ -68,6 +69,7 @@ class DeviceModel(BaseModel):
     name: str
     ip: str
     pixels: int
+    port: int = 6454
 
 
 class GroupModel(BaseModel):
@@ -85,7 +87,7 @@ class ColorModel(BaseModel):
 @app.post('/devices')
 async def create_device(device: DeviceModel):
     try:
-        controller.add_device(device.name, device.ip, device.pixels)
+        controller.add_device(device.name, device.ip, device.pixels, device.port)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return {"status": "ok"}
