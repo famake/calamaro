@@ -56,7 +56,9 @@ class Controller:
             raise ValueError(f"Group {group} not defined")
         for device in self.groups[group].devices:
             universe = self.universes[device.name]
-            ch = universe.add_channel(0, device.pixels * 3, 'uint8')
+            # DMX channel indexing starts at 1. Using 0 causes a
+            # ChannelOutOfUniverseError in pyartnet.
+            ch = universe.add_channel(1, device.pixels * 3, 'uint8')
             await ch.add_fade([r, g, b] * device.pixels, 0)
 
 
